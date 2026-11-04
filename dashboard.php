@@ -1,21 +1,32 @@
-<!DOCTYPE html>
-<html lang="kk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Менің саяхаттарым | TripWise</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
 
-<header class="header">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <nav>
-        <a href="index.php">Басты бет</a>
-        <a href="dashboard.php">Менің саяхаттарым</a>
-    </nav>
-    <a href="login.php" class="login-link">Шығу</a>
-</header>
+<?php
+$pageTitle = 'Менің саяхаттарым | TripWise';
+$headerType = 'dashboard';
+$footerText = '© 2026 TripWise';
+
+$search = trim($_GET['search'] ?? '');
+
+$trips = [
+    [
+        'title' => 'Стамбулға саяхат',
+        'place' => 'Стамбул, Түркия',
+        'date' => '15–20 наурыз',
+        'budget' => '250 000 ₸',
+        'status' => 'Жоспарланған',
+        'picture' => 'trip-one'
+    ],
+    [
+        'title' => 'Бали аралы',
+        'place' => 'Бали, Индонезия',
+        'date' => 'Күні белгіленбеген',
+        'budget' => 'Әлі белгіленбеген',
+        'status' => 'Армандағы бағыт',
+        'picture' => 'trip-two'
+    ]
+];
+
+include 'includes/header.php';
+?>
 
 <main class="dashboard">
     <div class="dashboard-heading">
@@ -24,43 +35,63 @@
             <h1>Менің саяхаттарым</h1>
             <p>Келесі саяхатыңды жоспарлауға дайынсың ба?</p>
         </div>
+
         <button class="btn" id="add-trip">+ Саяхат қосу</button>
     </div>
 
-    <div class="trip-grid">
-        <article class="trip-card">
-            <div class="trip-picture trip-one"></div>
-            <div class="trip-info">
-                <span class="trip-status">Жоспарланған</span>
-                <h2>Стамбулға саяхат</h2>
-                <p>📍 Стамбул, Түркия</p>
-                <p>📅 15–20 наурыз</p>
-                <p>💰 Бюджет: 250 000 ₸</p>
-                <button class="btn trip-button">Толығырақ</button>
-            </div>
-        </article>
+    <form method="GET" action="dashboard.php">
+        <input
+            type="search"
+            name="search"
+            placeholder="Саяхатты іздеу..."
+            value="<?= htmlspecialchars($search) ?>"
+        >
+        <button type="submit" class="btn">Іздеу</button>
+        <a href="dashboard.php">Тазалау</a>
+    </form>
 
-        <article class="trip-card">
-            <div class="trip-picture trip-two"></div>
-            <div class="trip-info">
-                <span class="trip-status">Армандағы бағыт</span>
-                <h2>Бали аралы</h2>
-                <p>📍 Бали, Индонезия</p>
-                <p>📅 Күні белгіленбеген</p>
-                <p>💰 Бюджет: Әлі белгіленбеген</p>
-                <button class="btn trip-button">Толығырақ</button>
-            </div>
-        </article>
+    <div class="trip-grid">
+        <?php
+        $found = false;
+
+        foreach ($trips as $trip):
+            $searchText = $trip['title'] . ' ' . $trip['place'];
+
+            if (
+                $search === '' ||
+                stripos($searchText, $search) !== false
+            ):
+                $found = true;
+        ?>
+            <article class="trip-card">
+                <div class="trip-picture <?= htmlspecialchars($trip['picture']) ?>"></div>
+
+                <div class="trip-info">
+                    <span class="trip-status">
+                        <?= htmlspecialchars($trip['status']) ?>
+                    </span>
+
+                    <h2><?= htmlspecialchars($trip['title']) ?></h2>
+                    <p>📍 <?= htmlspecialchars($trip['place']) ?></p>
+                    <p>📅 <?= htmlspecialchars($trip['date']) ?></p>
+                    <p>💰 Бюджет: <?= htmlspecialchars($trip['budget']) ?></p>
+
+                    <button type="button" class="btn trip-button">
+                        Толығырақ
+                    </button>
+                </div>
+            </article>
+        <?php
+            endif;
+        endforeach;
+
+        if (!$found):
+        ?>
+            <p>Іздеу бойынша саяхат табылмады.</p>
+        <?php endif; ?>
     </div>
 
     <p id="dashboard-message"></p>
 </main>
 
-<footer class="footer">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <p>© 2026 TripWise</p>
-</footer>
-
-<script src="js/script.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

@@ -1,33 +1,19 @@
-<!DOCTYPE html>
-<html lang="kk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TripWise — Саяхат жоспарлаушы</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
 
-<header class="header">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
+<?php
+$pageTitle = 'TripWise — Саяхат жоспарлаушы';
+$headerType = 'home';
+$footerText = 'Саяхаттарыңды жоспарла, естеліктеріңді жина.';
 
-    <nav>
-        <a href="index.php">Басты бет</a>
-        <a href="#features">Мүмкіндіктер</a>
-        <a href="#about">Біз туралы</a>
-    </nav>
-
-    <div class="header-buttons">
-        <a href="login.php" class="login-link">Кіру</a>
-        <a href="register.php" class="btn btn-small">Тіркелу</a>
-    </div>
-</header>
+include 'includes/header.php';
+?>
 
 <main>
     <section class="hero">
         <div class="hero-content">
             <p class="eyebrow">САЯХАТЫҢДЫ БҮГІН ЖОСПАРЛА</p>
+
             <h1>Әлемді аш.<br><span>Өз жолыңды таңда.</span></h1>
+
             <p class="hero-text">
                 Армандаған сапарыңды жоспарла, баратын жерлеріңді сақта
                 және саяхатыңды бір жерде ұйымдастыр.
@@ -87,16 +73,9 @@
             <p class="eyebrow">СЕНІҢ САЯХАТЫҢ — СЕНІҢ ЕРЕЖЕҢ</p>
             <h2>Жоспарлау оңай болғанда, саяхат та ерекше.</h2>
         </div>
+
         <a href="register.php" class="btn">Бастау ↗</a>
     </section>
 </main>
 
-<footer class="footer">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <p>Саяхаттарыңды жоспарла, естеліктеріңді жина.</p>
-    <p>© 2026 TripWise</p>
-</footer>
-
-<script src="js/script.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

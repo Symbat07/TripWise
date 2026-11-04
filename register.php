@@ -1,17 +1,30 @@
-<!DOCTYPE html>
-<html lang="kk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тіркелу | TripWise</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="auth-page">
 
-<header class="header">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <a href="index.php" class="login-link">← Басты бетке оралу</a>
-</header>
+<?php
+$pageTitle = 'Тіркелу | TripWise';
+$bodyClass = 'auth-page';
+$headerType = 'auth';
+$footerText = '© 2026 TripWise';
+
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if ($name === '' || $email === '' || $password === '') {
+        $message = 'Барлық өрісті толтырыңыз!';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = 'Email мекенжайы дұрыс емес!';
+    } elseif (strlen($password) < 8) {
+        $message = 'Құпиясөз кемінде 8 таңбадан тұруы керек!';
+    } else {
+        $message = 'Деректер дұрыс енгізілді! Тіркелуді сақтау 11-аптада қосылады.';
+    }
+}
+
+include 'includes/header.php';
+?>
 
 <main class="auth-container">
     <section class="auth-card">
@@ -19,15 +32,39 @@
         <h1>Аккаунт құру</h1>
         <p class="auth-description">Өз саяхаттарыңды жоспарлауға қосыл.</p>
 
-        <form>
+        <?php if ($message !== ''): ?>
+            <p><?= htmlspecialchars($message) ?></p>
+        <?php endif; ?>
+
+        <form method="POST" action="register.php">
             <label for="name">Аты-жөнің</label>
-            <input type="text" id="name" placeholder="Атыңды енгіз" required>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Атыңды енгіз"
+                value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
+                required
+            >
 
             <label for="email">Электрондық пошта</label>
-            <input type="email" id="email" placeholder="example@email.com" required>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="example@email.com"
+                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                required
+            >
 
             <label for="password">Құпиясөз</label>
-            <input type="password" id="password" placeholder="Құпиясөз ойлап тап" required>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Құпиясөз ойлап тап"
+                required
+            >
 
             <button type="submit" class="btn auth-submit">Тіркелу</button>
         </form>
@@ -38,11 +75,4 @@
     </section>
 </main>
 
-<footer class="footer">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <p>© 2026 TripWise</p>
-</footer>
-
-<script src="js/script.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>

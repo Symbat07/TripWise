@@ -1,17 +1,27 @@
-<!DOCTYPE html>
-<html lang="kk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Жүйеге кіру | TripWise</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="auth-page">
 
-<header class="header">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <a href="index.php" class="login-link">← Басты бетке оралу</a>
-</header>
+<?php
+$pageTitle = 'Жүйеге кіру | TripWise';
+$bodyClass = 'auth-page';
+$headerType = 'auth';
+$footerText = '© 2026 TripWise';
+
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if ($email === '' || $password === '') {
+        $message = 'Email мен құпиясөзді енгізіңіз!';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = 'Email мекенжайы дұрыс емес!';
+    } else {
+        $message = 'Деректер тексерілді! Нақты кіру жүйесі 11-аптада қосылады.';
+    }
+}
+
+include 'includes/header.php';
+?>
 
 <main class="auth-container">
     <section class="auth-card">
@@ -19,12 +29,28 @@
         <h1>Жүйеге кіру</h1>
         <p class="auth-description">Саяхат жоспарларыңды жалғастыр.</p>
 
-        <form>
+        <?php if ($message !== ''): ?>
+            <p><?= htmlspecialchars($message) ?></p>
+        <?php endif; ?>
+
+        <form method="POST" action="login.php">
             <label for="email">Электрондық пошта</label>
-            <input type="email" id="email" placeholder="example@email.com" required>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="example@email.com"
+                required
+            >
 
             <label for="password">Құпиясөз</label>
-            <input type="password" id="password" placeholder="Құпиясөзіңді енгіз" required>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Құпиясөзіңді енгіз"
+                required
+            >
 
             <button type="submit" class="btn auth-submit">Кіру</button>
         </form>
@@ -35,11 +61,4 @@
     </section>
 </main>
 
-<footer class="footer">
-    <a href="index.php" class="logo">Trip<span>Wise</span></a>
-    <p>© 2026 TripWise</p>
-</footer>
-
-<script src="js/script.js"></script>
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>
