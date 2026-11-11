@@ -1,11 +1,18 @@
 
 <?php
+session_start();
+require_once 'config/database.php';
+
 $pageTitle = 'Жүйеге кіру | TripWise';
 $bodyClass = 'auth-page';
 $headerType = 'auth';
 $footerText = '© 2026 TripWise';
 
 $message = '';
+
+if (isset($_GET['registered'])) {
+    $message = 'Тіркелу сәтті аяқталды! Енді жүйеге кіріңіз.';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
@@ -16,7 +23,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = 'Email мекенжайы дұрыс емес!';
     } else {
-        $message = 'Деректер тексерілді! Нақты кіру жүйесі 11-аптада қосылады.';
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            session_regenerate_id(true);
+
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+
+            header('Location: dashboard.php');
+            exit;
+        } else {
+            $message = 'Email немесе құпиясөз қате!';
+        }
     }
 }
 

@@ -1,10 +1,17 @@
-
 <?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
 $pageTitle = 'Менің саяхаттарым | TripWise';
 $headerType = 'dashboard';
 $footerText = '© 2026 TripWise';
 
 $search = trim($_GET['search'] ?? '');
+
 
 $trips = [
     [

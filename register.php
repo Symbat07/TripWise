@@ -1,5 +1,7 @@
-
 <?php
+session_start();
+require_once 'config/database.php';
+
 $pageTitle = 'Тіркелу | TripWise';
 $bodyClass = 'auth-page';
 $headerType = 'auth';
@@ -19,7 +21,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 8) {
         $message = 'Құпиясөз кемінде 8 таңбадан тұруы керек!';
     } else {
-        $message = 'Деректер дұрыс енгізілді! Тіркелуді сақтау 11-аптада қосылады.';
+        $check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $check->execute([$email]);
+
+        if ($check->fetch()) {
+            $message = 'Бұл email бұрын тіркелген!';
+        } else {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            $insert = $pdo->prepare(
+                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
+            );
+
+            $insert->execute([$name, $email, $hashedPassword]);
+
+            header('Location: login.php?registered=1');
+            exit;
+        }
     }
 }
 
