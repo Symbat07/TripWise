@@ -6,31 +6,39 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+require_once 'config/database.php';
+
 $pageTitle = 'Менің саяхаттарым | TripWise';
 $headerType = 'dashboard';
 $footerText = '© 2026 TripWise';
 
+
 $search = trim($_GET['search'] ?? '');
 
+$stmt = $pdo->prepare("
+    SELECT
+        trips.id,
+        trips.title,
+        CONCAT(destinations.name, ', ', destinations.country) AS place,
+        CONCAT(
+            DATE_FORMAT(trips.start_date, '%d.%m.%Y'),
+            ' – ',
+            DATE_FORMAT(trips.end_date, '%d.%m.%Y')
+        ) AS date,
+        CONCAT(FORMAT(trips.budget, 0), ' ₸') AS budget,
+        'Жоспарланған' AS status,
+        'trip-one' AS picture
+    FROM trips
+    LEFT JOIN destinations
+        ON trips.destination_id = destinations.id
+    WHERE trips.user_id = ?
+    ORDER BY trips.created_at DESC
+");
 
-$trips = [
-    [
-        'title' => 'Стамбулға саяхат',
-        'place' => 'Стамбул, Түркия',
-        'date' => '15–20 наурыз',
-        'budget' => '250 000 ₸',
-        'status' => 'Жоспарланған',
-        'picture' => 'trip-one'
-    ],
-    [
-        'title' => 'Бали аралы',
-        'place' => 'Бали, Индонезия',
-        'date' => 'Күні белгіленбеген',
-        'budget' => 'Әлі белгіленбеген',
-        'status' => 'Армандағы бағыт',
-        'picture' => 'trip-two'
-    ]
-];
+$stmt->execute([$_SESSION['user_id']]);
+
+$trips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 include 'includes/header.php';
 ?>
@@ -43,7 +51,7 @@ include 'includes/header.php';
             <p>Келесі саяхатыңды жоспарлауға дайынсың ба?</p>
         </div>
 
-        <button class="btn" id="add-trip">+ Саяхат қосу</button>
+        <a href="add_trip.php" class="btn" id="add-trip">+ Саяхат қосу</a>
     </div>
 
     <form method="GET" action="dashboard.php">
@@ -83,9 +91,16 @@ include 'includes/header.php';
                     <p>📅 <?= htmlspecialchars($trip['date']) ?></p>
                     <p>💰 Бюджет: <?= htmlspecialchars($trip['budget']) ?></p>
 
-                    <button type="button" class="btn trip-button">
-                        Толығырақ
-                    </button>
+                    <a href="edit_trip.php?id=<?= $trip['id'] ?>" class="btn trip-button">
+                        Өңдеу
+                    </a>
+                    <form method="POST" action="delete_trip.php"
+                          onsubmit="return confirm('Бұл саяхатты өшіргіңіз келе ме?');">
+                        <input type="hidden" name="id" value="<?= $trip['id'] ?>">
+                        <button type="submit" class="btn trip-button">
+                            Өшіру
+                        </button>
+                    </form>
                 </div>
             </article>
         <?php
