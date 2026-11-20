@@ -32,10 +32,11 @@ $headerType = $headerType ?? 'home';
         <a href="index.php" class="login-link">← Басты бетке оралу</a>
 
     <?php elseif ($headerType === 'dashboard'): ?>
-        <nav>
-            <a href="index.php">Басты бет</a>
-            <a href="dashboard.php">Менің саяхаттарым</a>
-        </nav>
-        <a href="logout.php" class="login-link">Шығу</a>
+    <nav>
+        <a href="index.php">Басты бет</a>
+        <a href="dashboard.php">Менің саяхаттарым</a>
+        <a href="profile.php">Менің профилім</a>
+    </nav>
+    <a href="logout.php" class="login-link">Шығу</a>
     <?php endif; ?>
 </header>

@@ -9,6 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once 'config/database.php';
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $pageTitle = 'Саяхат қосу | TripWise';
 $headerType = 'dashboard';
 $footerText = '© 2026 TripWise';
@@ -16,6 +20,12 @@ $footerText = '© 2026 TripWise';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (
+        !isset($_POST['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        die('Қате сұраныс! Қауіпсіздік тексерісінен өтпеді.');
+    }
     $title = trim($_POST['title'] ?? '');
     $destination = trim($_POST['destination'] ?? '');
     $country = trim($_POST['country'] ?? '');
@@ -28,11 +38,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $message = 'Барлық өрісті толтырыңыз!';
 
-    } elseif ($endDate < $startDate) {
-        $message = 'Аяқталу күні басталу күнінен ерте болмауы керек!';
+    } elseif (
+    !DateTime::createFromFormat('Y-m-d', $startDate) ||
+    !DateTime::createFromFormat('Y-m-d', $endDate)
+    ) {
+    $message = 'Күн форматын дұрыс енгізіңіз!';
 
-    } elseif (!is_numeric($budget) || $budget <= 0) {
-        $message = 'Бюджетті дұрыс енгізіңіз!';
+    } elseif ($endDate < $startDate) {
+    $message = 'Аяқталу күні басталу күнінен ерте болмауы керек!';
+
+    } elseif (
+    !is_numeric($budget) ||
+    !is_finite((float)$budget) ||
+    (float)$budget <= 0 ||
+    (float)$budget > 999999999
+    ) {
+    $message = 'Бюджетті дұрыс енгізіңіз!';
 
     } else {
         $pdo->beginTransaction();
@@ -87,6 +108,12 @@ include 'includes/header.php';
         <?php endif; ?>
 
         <form method="POST" action="add_trip.php">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>"
+            >
 
             <label for="title">Саяхат атауы</label>
             <input type="text" id="title" name="title"
